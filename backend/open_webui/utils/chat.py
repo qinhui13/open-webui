@@ -49,6 +49,10 @@ from open_webui.utils.filter import (
     get_sorted_filter_ids,
     process_filter_functions,
 )
+from open_webui.utils.openclaw import (
+    generate_openclaw_chat_completion,
+    is_openclaw_model_id,
+)
 
 from open_webui.env import GLOBAL_LOG_LEVEL, BYPASS_MODEL_ACCESS_CONTROL
 
@@ -201,6 +205,11 @@ async def generate_chat_completion(
         raise Exception('Model not found')
 
     model = models[model_id]
+
+    # OpenClaw Agent 在前端仍以“模型”对象出现，但真正的执行入口是 Gateway 会话流，
+    # 所以这里在统一分发层做一次短路，直接进入 OpenClaw 专用实现。
+    if is_openclaw_model_id(model_id) or model.get('owned_by') == 'openclaw':
+        return await generate_openclaw_chat_completion(request, form_data, user)
 
     if getattr(request.state, 'direct', False) and model_id == getattr(request.state, 'model', {}).get('id'):
         return await generate_direct_chat_completion(request, form_data, user=user, models=models)

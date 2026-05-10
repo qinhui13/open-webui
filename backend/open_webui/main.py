@@ -134,6 +134,14 @@ from open_webui.config import (
     OPENAI_API_BASE_URLS,
     OPENAI_API_KEYS,
     OPENAI_API_CONFIGS,
+    # OpenClaw
+    ENABLE_OPENCLAW_GATEWAY,
+    OPENCLAW_GATEWAY_URL,
+    OPENCLAW_GATEWAY_TOKEN,
+    OPENCLAW_GATEWAY_CLIENT_ID,
+    OPENCLAW_GATEWAY_CLIENT_MODE,
+    OPENCLAW_GATEWAY_DEVICE_PATH,
+    OPENCLAW_ALLOWED_AGENT_IDS,
     # Direct Connections
     ENABLE_DIRECT_CONNECTIONS,
     # Model list
@@ -823,6 +831,20 @@ app.state.config.OPENAI_API_KEYS = OPENAI_API_KEYS
 app.state.config.OPENAI_API_CONFIGS = OPENAI_API_CONFIGS
 
 app.state.OPENAI_MODELS = {}
+
+########################################
+#
+# OPENCLAW
+#
+########################################
+
+app.state.config.ENABLE_OPENCLAW_GATEWAY = ENABLE_OPENCLAW_GATEWAY
+app.state.config.OPENCLAW_GATEWAY_URL = OPENCLAW_GATEWAY_URL
+app.state.config.OPENCLAW_GATEWAY_TOKEN = OPENCLAW_GATEWAY_TOKEN
+app.state.config.OPENCLAW_GATEWAY_CLIENT_ID = OPENCLAW_GATEWAY_CLIENT_ID
+app.state.config.OPENCLAW_GATEWAY_CLIENT_MODE = OPENCLAW_GATEWAY_CLIENT_MODE
+app.state.config.OPENCLAW_GATEWAY_DEVICE_PATH = OPENCLAW_GATEWAY_DEVICE_PATH
+app.state.config.OPENCLAW_ALLOWED_AGENT_IDS = OPENCLAW_ALLOWED_AGENT_IDS
 
 ########################################
 #
@@ -2364,6 +2386,9 @@ async def get_app_config(request: Request):
             'enable_version_update_check': ENABLE_VERSION_UPDATE_CHECK,
             'enable_public_active_users_count': ENABLE_PUBLIC_ACTIVE_USERS_COUNT,
             'enable_easter_eggs': ENABLE_EASTER_EGGS,
+            # OpenClaw 入口文案需要在登录前后的首屏阶段都稳定可见。
+            # 这里把开关放到公共 config，避免前端先拿到“未登录版 features”时丢失 Agent 语义。
+            'enable_openclaw_gateway': app.state.config.ENABLE_OPENCLAW_GATEWAY,
             **(
                 {
                     'enable_direct_connections': app.state.config.ENABLE_DIRECT_CONNECTIONS,
